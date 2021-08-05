@@ -1,0 +1,150 @@
+# These are debugging curl requests used for testing the
+# Market Informed Demand Automation Server (MIDAS) API
+# from the CEC's Load Management Rulemaking (19-OIR-01)
+
+# Copyright 2021 UtilityAPI, Inc.
+# Released under MIT License
+
+##################
+## Registration ##
+##################
+
+# registration variables
+ORG_NAME="<redacted>"
+USER_NAME="<redacted>"
+USER_PASS="<redacted>"
+EMAIL_ADDRESS="<redacted>"
+FULL_NAME="<redacted>"
+
+# base64 encoding
+ORG_NAME_64=$(bash -c "echo -n \"$ORG_NAME\" | base64")
+USER_NAME_64=$(bash -c "echo -n \"$USER_NAME\" | base64")
+USER_PASS_64=$(bash -c "echo -n \"$USER_PASS\" | base64")
+EMAIL_ADDRESS_64=$(bash -c "echo -n \"$EMAIL_ADDRESS\" | base64")
+FULL_NAME_64=$(bash -c "echo -n \"$FULL_NAME\" | base64")
+
+# registration request
+curl -v \
+    -H "Content-Type: application/json" \
+    --data-binary "{\
+        \"organization\":\"$ORG_NAME_64\",\
+        \"username\":\"$USER_NAME_64\",\
+        \"password\":\"$USER_PASS_64\",\
+        \"emailaddress\":\"$EMAIL_ADDRESS_64\",\
+        \"fullname\":\"$FULL_NAME_64\"\
+    }" \
+    "https://cecwats2.org/api/registration"
+
+
+###############
+## Get Token ##
+###############
+
+# (assumes $USER_NAME and $USER_PASS are set)
+
+BASIC_AUTH=$(bash -c "echo -n \"$USER_NAME:$USER_PASS\" | base64")
+TOKEN=$(bash -c "\
+    curl -v --stderr - \
+        -H 'Authorization: Basic $BASIC_AUTH' \
+        'https://cecwats2.org/api/token' \
+    | grep -Po 'Token: [a-zA-Z0-9\.\-\_]+' \
+    | cut -d' ' -f2\
+")
+echo $TOKEN  # print the token to make sure we got it
+
+
+################
+## Get Values ##
+################
+
+# (assumes $TOKEN is set)
+
+# RATE_ID possibilities:
+#   USCA-PGPG-EV2A-0000
+#   USCA-PGPG-TA1B-0000
+#   USCA-SCSC-T015-0000
+#   USCA-SCSC-T018-0000
+#   USCA-SDSD-TDRP-0000
+#   USCA-SDSD-TOA1-0000
+
+# QUERY_TYPE possibilities:
+#   alldata
+#   realtime
+
+# FORMAT_TYPE possibilities:
+#   application/json
+#   application/xml
+
+# json alldata
+RATE_ID="USCA-PGPG-TA1B-0000"
+QUERY_TYPE="alldata"
+FORMAT_TYPE="application/json"
+curl -v \
+    -H "Accept: $FORMAT_TYPE" \
+    -H "Authorization: Bearer $TOKEN" \
+    "https://cecwats2.org/api/valuedata?id=$RATE_ID&querytype=$QUERY_TYPE"
+
+# json realtime
+RATE_ID="USCA-PGPG-TA1B-0000"
+QUERY_TYPE="realtime"
+FORMAT_TYPE="application/json"
+curl -v \
+    -H "Accept: $FORMAT_TYPE" \
+    -H "Authorization: Bearer $TOKEN" \
+    "https://cecwats2.org/api/valuedata?id=$RATE_ID&querytype=$QUERY_TYPE"
+
+# xml alldata
+RATE_ID="USCA-PGPG-TA1B-0000"
+QUERY_TYPE="alldata"
+FORMAT_TYPE="application/xml"
+curl -v \
+    -H "Accept: $FORMAT_TYPE" \
+    -H "Authorization: Bearer $TOKEN" \
+    "https://cecwats2.org/api/valuedata?id=$RATE_ID&querytype=$QUERY_TYPE"
+
+# get prices (xml realtime)
+RATE_ID="USCA-PGPG-TA1B-0000"
+QUERY_TYPE="realtime"
+FORMAT_TYPE="application/xml"
+curl -v \
+    -H "Accept: $FORMAT_TYPE" \
+    -H "Authorization: Bearer $TOKEN" \
+    "https://cecwats2.org/api/valuedata?id=$RATE_ID&querytype=$QUERY_TYPE"
+
+
+######################
+## Get Lookup Table ##
+######################
+
+# (assumes $TOKEN is set)
+
+# LOOKUP_TABLE possibilities:
+#   country
+#   daytype
+#   distribution
+#   enduse
+#   energy
+#   location
+#   ratetype
+#   sector
+#   state
+
+# FORMAT_TYPE possibilities:
+#   application/json
+#   application/xml
+
+# json country
+LOOKUP_TABLE="country"
+FORMAT_TYPE="application/json"
+curl -v \
+    -H "Accept: $FORMAT_TYPE" \
+    -H "Authorization: Bearer $TOKEN" \
+    "https://cecwats2.org/api/valuedata?LookupTable=$LOOKUP_TABLE"
+
+# xml country
+LOOKUP_TABLE="country"
+FORMAT_TYPE="application/xml"
+curl -v \
+    -H "Accept: $FORMAT_TYPE" \
+    -H "Authorization: Bearer $TOKEN" \
+    "https://cecwats2.org/api/valuedata?LookupTable=$LOOKUP_TABLE"
