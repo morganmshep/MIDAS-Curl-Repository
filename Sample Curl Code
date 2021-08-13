@@ -33,7 +33,7 @@ curl -v \
         \"emailaddress\":\"$EMAIL_ADDRESS_64\",\
         \"fullname\":\"$FULL_NAME_64\"\
     }" \
-    "https://cecwats2.org/api/registration"
+    "https://midasapi.energy.ca.gov/api/registration"
 
 
 ###############
@@ -46,7 +46,7 @@ BASIC_AUTH=$(bash -c "echo -n \"$USER_NAME:$USER_PASS\" | base64")
 TOKEN=$(bash -c "\
     curl -v --stderr - \
         -H 'Authorization: Basic $BASIC_AUTH' \
-        'https://cecwats2.org/api/token' \
+        'https://midasapi.energy.ca.gov/api/token' \
     | grep -Po 'Token: [a-zA-Z0-9\.\-\_]+' \
     | cut -d' ' -f2\
 ")
@@ -82,7 +82,7 @@ FORMAT_TYPE="application/json"
 curl -v \
     -H "Accept: $FORMAT_TYPE" \
     -H "Authorization: Bearer $TOKEN" \
-    "https://cecwats2.org/api/valuedata?id=$RATE_ID&querytype=$QUERY_TYPE"
+    "https://midasapi.energy.ca.gov/api/valuedata?id=$RATE_ID&querytype=$QUERY_TYPE"
 
 # json realtime
 RATE_ID="USCA-PGPG-TA1B-0000"
@@ -91,7 +91,7 @@ FORMAT_TYPE="application/json"
 curl -v \
     -H "Accept: $FORMAT_TYPE" \
     -H "Authorization: Bearer $TOKEN" \
-    "https://cecwats2.org/api/valuedata?id=$RATE_ID&querytype=$QUERY_TYPE"
+    "https://midasapi.energy.ca.gov/api/valuedata?id=$RATE_ID&querytype=$QUERY_TYPE"
 
 # xml alldata
 RATE_ID="USCA-PGPG-TA1B-0000"
@@ -100,7 +100,7 @@ FORMAT_TYPE="application/xml"
 curl -v \
     -H "Accept: $FORMAT_TYPE" \
     -H "Authorization: Bearer $TOKEN" \
-    "https://cecwats2.org/api/valuedata?id=$RATE_ID&querytype=$QUERY_TYPE"
+    "https://midasapi.energy.ca.gov/api/valuedata?id=$RATE_ID&querytype=$QUERY_TYPE"
 
 # get prices (xml realtime)
 RATE_ID="USCA-PGPG-TA1B-0000"
@@ -109,7 +109,7 @@ FORMAT_TYPE="application/xml"
 curl -v \
     -H "Accept: $FORMAT_TYPE" \
     -H "Authorization: Bearer $TOKEN" \
-    "https://cecwats2.org/api/valuedata?id=$RATE_ID&querytype=$QUERY_TYPE"
+    "https://midasapi.energy.ca.gov/api/valuedata?id=$RATE_ID&querytype=$QUERY_TYPE"
 
 
 ######################
@@ -139,7 +139,7 @@ FORMAT_TYPE="application/json"
 curl -v \
     -H "Accept: $FORMAT_TYPE" \
     -H "Authorization: Bearer $TOKEN" \
-    "https://cecwats2.org/api/valuedata?LookupTable=$LOOKUP_TABLE"
+    "https://midasapi.energy.ca.gov/api/valuedata?LookupTable=$LOOKUP_TABLE"
 
 # xml country
 LOOKUP_TABLE="country"
@@ -147,4 +147,4 @@ FORMAT_TYPE="application/xml"
 curl -v \
     -H "Accept: $FORMAT_TYPE" \
     -H "Authorization: Bearer $TOKEN" \
-    "https://cecwats2.org/api/valuedata?LookupTable=$LOOKUP_TABLE"
+    "https://midasapi.energy.ca.gov/api/valuedata?LookupTable=$LOOKUP_TABLE"
