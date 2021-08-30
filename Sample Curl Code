@@ -33,7 +33,7 @@ curl -v \
         \"emailaddress\":\"$EMAIL_ADDRESS_64\",\
         \"fullname\":\"$FULL_NAME_64\"\
     }" \
-    "https://midasapi.energy.ca.gov/api/registration"
+    "https://midasapi.energy.ca.gov/api/Registration"
 
 
 ###############
@@ -46,7 +46,7 @@ BASIC_AUTH=$(bash -c "echo -n \"$USER_NAME:$USER_PASS\" | base64")
 TOKEN=$(bash -c "\
     curl -v --stderr - \
         -H 'Authorization: Basic $BASIC_AUTH' \
-        'https://midasapi.energy.ca.gov/api/token' \
+        'https://midasapi.energy.ca.gov/api/Token' \
     | grep -Po 'Token: [a-zA-Z0-9\.\-\_]+' \
     | cut -d' ' -f2\
 ")
@@ -82,7 +82,7 @@ FORMAT_TYPE="application/json"
 curl -v \
     -H "Accept: $FORMAT_TYPE" \
     -H "Authorization: Bearer $TOKEN" \
-    "https://midasapi.energy.ca.gov/api/valuedata?id=$RATE_ID&querytype=$QUERY_TYPE"
+    "https://midasapi.energy.ca.gov/api/ValueData/$RATE_ID?querytype=$QUERY_TYPE"
 
 # json realtime
 RATE_ID="USCA-PGPG-TA1B-0000"
@@ -91,7 +91,7 @@ FORMAT_TYPE="application/json"
 curl -v \
     -H "Accept: $FORMAT_TYPE" \
     -H "Authorization: Bearer $TOKEN" \
-    "https://midasapi.energy.ca.gov/api/valuedata?id=$RATE_ID&querytype=$QUERY_TYPE"
+    "https://midasapi.energy.ca.gov/api/ValueData/$RATE_ID?querytype=$QUERY_TYPE"
 
 # xml alldata
 RATE_ID="USCA-PGPG-TA1B-0000"
@@ -100,7 +100,7 @@ FORMAT_TYPE="application/xml"
 curl -v \
     -H "Accept: $FORMAT_TYPE" \
     -H "Authorization: Bearer $TOKEN" \
-    "https://midasapi.energy.ca.gov/api/valuedata?id=$RATE_ID&querytype=$QUERY_TYPE"
+    "https://midasapi.energy.ca.gov/api/ValueData/$RATE_ID?querytype=$QUERY_TYPE"
 
 # get prices (xml realtime)
 RATE_ID="USCA-PGPG-TA1B-0000"
@@ -109,7 +109,7 @@ FORMAT_TYPE="application/xml"
 curl -v \
     -H "Accept: $FORMAT_TYPE" \
     -H "Authorization: Bearer $TOKEN" \
-    "https://midasapi.energy.ca.gov/api/valuedata?id=$RATE_ID&querytype=$QUERY_TYPE"
+    "https://midasapi.energy.ca.gov/api/ValueData/$RATE_ID?querytype=$QUERY_TYPE"
 
 
 ######################
@@ -139,7 +139,7 @@ FORMAT_TYPE="application/json"
 curl -v \
     -H "Accept: $FORMAT_TYPE" \
     -H "Authorization: Bearer $TOKEN" \
-    "https://midasapi.energy.ca.gov/api/valuedata?LookupTable=$LOOKUP_TABLE"
+    "https://midasapi.energy.ca.gov/api/ValueData?LookupTable=$LOOKUP_TABLE"
 
 # xml country
 LOOKUP_TABLE="country"
@@ -147,4 +147,124 @@ FORMAT_TYPE="application/xml"
 curl -v \
     -H "Accept: $FORMAT_TYPE" \
     -H "Authorization: Bearer $TOKEN" \
-    "https://midasapi.energy.ca.gov/api/valuedata?LookupTable=$LOOKUP_TABLE"
+    "https://midasapi.energy.ca.gov/api/ValueData?LookupTable=$LOOKUP_TABLE"
+
+
+######################
+## Get List of RINs ##
+######################
+
+# Signal types
+#   0 - All signals
+#   1 - Tariffs only
+#   2 - GHG Emissions only
+#   3 - Flex Alerts only
+
+# json all signals
+SIGNAL_TYPE="0"
+FORMAT_TYPE="application/json"
+curl -v \
+    -H "Accept: $FORMAT_TYPE" \
+    -H "Authorization: Bearer $TOKEN" \
+    "https://midasapi.energy.ca.gov/api/ValueData?SignalType=$SIGNAL_TYPE"
+
+
+#######################
+## Loop through RINs ##
+#######################
+
+# list of known RINs
+KNOWN_RINS_FILE="/tmp/known_MIDAS_RINs.txt"
+cat <<EOF > $KNOWN_RINS_FILE
+# Tariffs
+USCA-SCSC-T023-0000
+USCA-SDSD-TOA3-0000
+USCA-SCSC-T034-0000
+USCA-PGPG-TOUC-0000
+USCA-SCSC-T046-0000
+USCA-SDSD-TDR1-0000
+USCA-PGPG-AGCP-0000
+USCA-SDSD-EVT5-0000
+USCA-SDSD-TOA1-0000
+USCA-SDSD-TOA2-0000
+USCA-SDSD-TDR2-0000
+USCA-PGPG-B6SP-0000
+USCA-SCSC-T033-0000
+USCA-SCSC-T045-0000
+USCA-SCSC-T014-0000
+USCA-PCSD-EVT2-0000
+USCA-PGPG-TA1B-0000
+USCA-PGPG-E19S-0000
+USCA-PGPG-TA6B-0000
+USCA-SCSC-T038-0000
+USCA-PGPG-TOUD-0000
+USCA-SMSM-TOD5-0000
+USCA-SDSD-TDRP-0000
+USCA-SCSC-T015-0000
+USCA-SCSC-T021-0000
+USCA-SCSC-T055-0000
+USCA-SCSC-T022-0000
+USCA-SCSC-T026-0000
+USCA-SDSD-EVT2-0000
+USCA-SCSC-T018-0000
+USCA-PCSD-EVT5-0000
+USCA-SCSC-T056-0000
+USCA-SCSC-T054-0000
+USCA-BNBN-EVT2-0000
+USCA-PCSD-TDR1-0000
+USCA-SCSC-T020-0000
+USCA-SCSC-T013-0000
+USCA-PGPG-B19S-0000
+USCA-PGPG-BEV1-0000
+USCA-SCSC-T027-0000
+USCA-PGPG-EV2A-0000
+USCA-SMSM-TOD5-0000
+USCA-SDSD-EVT1-0000
+USCA-SMSM-TOD5-0000
+# GHG Emissions
+USCA-SGIP-SGRT-PACW
+USCA-SGIP-SGRT-SDGE
+USCA-SGIP-SGRT-PGE
+USCA-SGIP-SGRT-BANC
+USCA-SGIP-SGRT-TID
+USCA-SGIP-SGRT-SMUD
+USCA-SGIP-SGRT-IID
+USCA-SGIP-SGRT-NVENERGY
+USCA-SGIP-SGRT-WALC
+USCA-SGIP-SGRT-SCE
+USCA-SGIP-SGRT-LADWP
+# Forecast RINS
+USCA-SGIP-SGFC-PACW
+USCA-SGIP-SGFC-SDGE
+USCA-SGIP-SGFC-PGE
+USCA-SGIP-SGFC-BANC
+USCA-SGIP-SGFC-TID
+USCA-SGIP-SGFC-SMUD
+USCA-SGIP-SGFC-IID
+USCA-SGIP-SGFC-NVENERGY
+USCA-SGIP-SGFC-WALC
+USCA-SGIP-SGFC-SCE
+USCA-SGIP-SGFC-LADWP
+# Flex Alert Real-Time
+USCA-FLEX-FXRT-0000
+# Flex Alert Forecast
+USCA-FLEX-FXFC-0000
+EOF
+
+# loop through lines and make request to get json data for each RIN
+KNOWN_RINS=$(cat $KNOWN_RINS_FILE)
+IFS=$'\n' # split on newlines only
+for KNOWN_RIN in $KNOWN_RINS
+do
+    # skip blank lines and comments (starts with "#")
+    if [ -n $KNOWN_RIN ] && [ $(echo "$KNOWN_RIN" | cut -c1) != "#" ]
+    then
+        echo "==== Start: $KNOWN_RIN ===="
+        curl \
+            -H "Accept: application/json" \
+            -H "Authorization: Bearer $TOKEN" \
+            "https://midasapi.energy.ca.gov/api/ValueData/$KNOWN_RIN?querytype=alldata"
+        echo -e "\n==== End: $KNOWN_RIN ===="
+    fi
+done
+unset IFS # reset newline separator
